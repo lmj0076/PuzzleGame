@@ -1,7 +1,6 @@
 from bangtal import *
 import random
 
-scene1 = Scene("main", "images/배경1.png")
 scene2 = Scene("GameStart", "images/배경1.png")
 
 setGameOption(GameOption.INVENTORY_BUTTON, False)
@@ -10,22 +9,6 @@ setGameOption(GameOption.MESSAGE_BOX_BUTTON, False)
 
 ############################################3
 #scene1
-
-photo = Object("images/원본1.png")
-photo.locate(scene1, 200, 10)
-photo.show()
-
-
-#start 버튼
-s_btn = Object("images/start.png")
-s_btn.locate(scene1, 600, 300)
-s_btn.setScale(1.8)
-s_btn.show()
-
-
-############################################3
-#scene2
-
 
 #restart 버튼
 rs_btn = Object("images/restart.png")
@@ -45,13 +28,11 @@ def e_btn_onMouseAction(x, y, action):
 e_btn.onMouseAction = e_btn_onMouseAction
 
 
-
-
-
 def find_index(object):
     for index in range(9):
         if p[index] == object:
             return index
+
 
 def movable(index):
     if index < 0: return False
@@ -61,6 +42,7 @@ def movable(index):
     if index > 2 and index - 3 == a: return True
     if index < 6 and index + 3 == a: return True
     return False
+
 
 def move(index):
     global a
@@ -79,6 +61,7 @@ def completed():
             return False
     return True
 
+
 d = [-1, 1, -3, 3]
 def random_move():
     while True:
@@ -86,6 +69,7 @@ def random_move():
         index = a + d[random.randrange(4)] 
         if movable(index):  break
     move(index)
+
 
 def onMouseAction_p(object, x, y, action):
     index = find_index(object)
@@ -96,12 +80,8 @@ def onMouseAction_p(object, x, y, action):
 Object.onMouseActionDefault = onMouseAction_p
 
 
-
-
 p = []
 init_p = []
-
-
 #정답 퍼즐 배열
 for i in range(9):
     piece = Object("images/{}.png".format(str(i+1)))
@@ -114,9 +94,9 @@ for i in range(9):
 a = 8   #빈칸
 p[a].hide()
 
+
 cnt = 5
 timer = Timer(1)
-
 def onTimeout():
     random_move()
     global cnt
@@ -133,14 +113,17 @@ timer.onTimeout = onTimeout
 
 
 
-
+time = Timer(10.0)
+showTimer(time)
+def onTimeout2():
+    showMessage("타임오버~ 실패!!")
+time.onTimeout = onTimeout2
 
 #reset 버튼
 def rs_btn_onMouseAction(x, y, action):
-    rl.clear()
-    scene1.enter()
     time.stop()
     time.set(10.0)
+    time.start()
 rs_btn.onMouseAction = rs_btn_onMouseAction
 
 
@@ -150,10 +133,7 @@ rs_btn.onMouseAction = rs_btn_onMouseAction
 
 
 
-
-
-
 timer.start()
-
+time.start()
 ############################################3
 startGame(scene2)
