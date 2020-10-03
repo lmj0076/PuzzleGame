@@ -26,14 +26,6 @@ s_btn.show()
 ############################################3
 #scene2
 
-#타이머
-time = Timer(20.0)
-showTimer(time)
-
-def time_onTimeout():
-    showMessage("실패~ㅠㅠ")
-time.onTimeout = time_onTimeout
-
 
 #restart 버튼
 rs_btn = Object("images/restart.png")
@@ -53,50 +45,93 @@ def e_btn_onMouseAction(x, y, action):
 e_btn.onMouseAction = e_btn_onMouseAction
 
 
+
+
+
+def find_index(object):
+    for index in range(9):
+        if p[index] == object:
+            return index
+
+def movable(index):
+    if index < 0: return False
+    if index > 8: return False
+    if index % 3 > 0 and index - 1 == a: return True
+    if index % 3 < 2 and index + 1 == a: return True
+    if index > 2 and index - 3 == a: return True
+    if index < 6 and index + 3 == a: return True
+    return False
+
+def move(index):
+    global a
+    p[index].locate(scene2, 100 + (340 * (a % 3)), 470 - (230 * (a // 3)))
+    p[a].locate(scene2, 100 + (340 * (index % 3)), 470 - (230 * (index // 3)))
+
+    object = p[index]
+    p[index] = p[a]
+    p[a] = object
+    a = index
+
+
+def completed():
+    for index in range(9):
+        if p[index] != init_p[index]:
+            return False
+    return True
+
+d = [-1, 1, -3, 3]
+def random_move():
+    while True:
+
+        index = a + d[random.randrange(4)] 
+        if movable(index):  break
+    move(index)
+
+def onMouseAction_p(object, x, y, action):
+    index = find_index(object)
+    if movable(index):
+        move(index)
+        if completed():
+            showMessage("성공~")
+Object.onMouseActionDefault = onMouseAction_p
+
+
+
+
 p = []
-check = p
-pp = []
-a = 7   #빈칸
+init_p = []
 
 
 #정답 퍼즐 배열
 for i in range(9):
-    p.append(Object("images/{}.png".format(str(i+1))))
-    p[i].locate(scene2, 100 + (340 * (i % 3)), 470 - (230 * (i // 3)))
-    p[i].hide()
+    piece = Object("images/{}.png".format(str(i+1)))
+    piece.locate(scene2, 100 + (340 * (i % 3)), 470 - (230 * (i // 3)))
+    piece.show()
 
-    
+    p.append(piece)
+    init_p.append(piece)
+
+a = 8   #빈칸
+p[a].hide()
+
+cnt = 5
+timer = Timer(1)
+
+def onTimeout():
+    random_move()
+    global cnt
+    print(cnt)
+    cnt = cnt - 1
+    if cnt > 0:
+        timer.set(0.1)
+        timer.start()
+timer.onTimeout = onTimeout
 
 
 
 
 
 
-
-#start 버튼 눌러서 퍼즐 섞기
-rl = []
-def s_btn_onMouseAction(x, y, action):
-    ran_num = random.randint(0, 8)
-
-    for j in range(9):
-        while ran_num in rl:
-            ran_num = random.randint(0, 8)
-        rl.append(ran_num)
-
-
-    #퍼즐 섞기
-    for k in rl:
-        pp.append(p[k])
-
-    for m in range(9):
-        pp[m].locate(scene2, 100 + (340 * (m % 3)), 470 - (230 * (m // 3)))
-        pp[m].show()
-
-    scene2.enter()
-    time.start()
-
-    pp[a].hide()
-s_btn.onMouseAction = s_btn_onMouseAction
 
 
 
@@ -118,6 +153,7 @@ rs_btn.onMouseAction = rs_btn_onMouseAction
 
 
 
+timer.start()
 
 ############################################3
-startGame(scene1)
+startGame(scene2)
